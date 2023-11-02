@@ -8,7 +8,9 @@ import {
     register,
     login,
     updatePassword,
-    
+    getProducts,
+    getProductssById,
+    AdminPostProducts
 
 } from './database.js';
 
@@ -87,6 +89,39 @@ app.put('/update-password', async (req, res) => {
     } 
   
     
+    
+});
+app.get('/products', async(req, res) => {
+    const products = await getProducts();
+    //afficher les noms des produit 
+    let names = [];
+    for (let i = 0; i < products.length; i++){
+        names.push(products[i].ProductName);
+    };
+    
+    res.status(200).send(names);
+});
+
+app.get('/products/:id', async (req, res) => {
+    const ProductID = req.params.id;
+    const products = await getProductssById(ProductID);
+    if (products != undefined) {
+        res.status(200).send(products.ProductName);
+    } else {
+        res.status(404).send({ message: "product not found" });
+    }
+});
+
+app.post('/admin/addproduct', async (req, res) => { 
+    const { UserID,  ProductName , Description , Price , StockQuantity } = req.body;
+    let productadded = await AdminPostProducts(UserID, ProductName, Description, Price, StockQuantity);
+    
+    if (productadded != undefined) {
+        res.status(200).send('Produit ajoute');
+    } else {
+        res.status(401).send(' this user can not post a product');
+    }
+   
     
 });
 

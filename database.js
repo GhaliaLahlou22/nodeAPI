@@ -53,3 +53,31 @@ export async function updatePassword(email ,password){
     WHERE email = ?`, [email,password])
 }
 
+export async function getProducts() {
+    const [rows] = await pool.query('SELECT * FROM products');
+    return rows;
+}
+
+export async function getProductssById(id) {
+    const [rows] = await pool.query(`
+    SELECT *
+    FROM products
+    WHERE ProductID =?
+    `, [id]);
+    return rows[0];
+}
+
+export async function AdminPostProducts( UserID,  ProductName , Description , Price , StockQuantity) {
+    const [rows] = await pool.query(`SELECT role
+    FROM users
+    WHERE id=?`, [UserID]);
+    console.log(rows[0].role)
+    if (rows[0].role === 'admin') {
+        const [res] = await pool.query(`
+        INSERT INTO products( ProductName, Description, Price, StockQuantity)
+        VALUES (?,?,?,?)`, [ProductName, Description, Price, StockQuantity]);
+        console.log(res)
+        return res;
+    }
+}
+
